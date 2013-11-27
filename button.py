@@ -1,7 +1,7 @@
 import pygame
 
 FontColor = (255,255,255)
-FontSize = 36
+FontSize = 20
 
 class Button(pygame.sprite.Sprite):
 
