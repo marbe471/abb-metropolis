@@ -10,6 +10,7 @@ class Button(pygame.sprite.Sprite):
 		self.height = h
 		self.width = w
 		self.image = pygame.Surface([self.height,self.width],pygame.SRCALPHA, 32)
+		self.image.fill((0,0,255))
 		self.font = pygame.font.SysFont('Helvetica', FontSize)
 		self.text = self.font.render(self.text, True, FontColor)
 		self.image.blit(self.text,(0,0))

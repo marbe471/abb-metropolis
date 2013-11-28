@@ -32,6 +32,9 @@ class obj(pygame.sprite.Sprite):
 	def getShowInfo(self):
 		return self.showInfo
 
+	def upgrade(self):
+		pass
+
 class House(obj):
 	"""docstring for house"""
 	def __init__(self):
@@ -39,6 +42,10 @@ class House(obj):
 		self.cost = 1000
 		self.energy = -10
 		self.info = "Kostnad: 1000,  Energi: -10"
+
+	def upgrade(self):
+		self.energy = - 5
+		print("upgrade House")
 		
 
 class Turbine(obj):
@@ -47,3 +54,8 @@ class Turbine(obj):
 		super(Turbine, self).__init__("gfx/placeholder.png")
 		self.cost = 1000
 		self.energy = 20
+
+
+	def upgrade(self):
+		print("upgrade Turbine")
+		self.energy = 35

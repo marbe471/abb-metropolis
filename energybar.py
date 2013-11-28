@@ -9,6 +9,9 @@ class Energybar():
 		self.image = pygame.Surface([arg,10])
 		self.image.fill(energyColor)
 		self.arg = arg
+		self.lines = pygame.image.load("gfx/lines.png")
+		self.image.blit(self.lines,(0,0))
+
 	def update(self,arg):
 		if arg <= 0:
 			self.image = pygame.Surface([1,10])
@@ -21,7 +24,8 @@ class Energybar():
 			self.image.fill(energyColor)
 		else:
 			self.image.fill(criticalColor)
-			
+		
+		self.image.blit(self.lines,(0,0))
 
 		return self.image		
 		

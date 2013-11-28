@@ -24,12 +24,10 @@ def paintScene():
 		for currentTurbine in turbineList:
 			screen.blit(currentTurbine.getImage(),(currentTurbine.getX(),currentTurbine.getY()))
 			
-		for currentHouse in houseList:
-			if currentHouse.getShowInfo() and infoScreen:
-				showInfo(currentHouse)
-		for currentTurbine in turbineList:
-			if currentTurbine.showInfo and infoScreen:
-				showInfo(currentTurbine)
+		if houseInfo:
+			showInfo(houseList[SelectedID])
+		elif turbineInfo:
+			showInfo(turbineList[SelectedID])
 
 		paintHUD()
 
@@ -38,10 +36,12 @@ def showInfo(obj):
 	rect = pygame.Surface((500,300), pygame.SRCALPHA, 32)
 	rect.fill((255, 255, 255, 70))
 	infoText = gameFont.render(" Information " + obj.info, True, (240,240,240))	
-	upgradeText = gameFont.render(" Upgrade? ", True, (0,0,0))
-	rect.blit(upgradeText,(400,250))
+	upgradeBtn.rect.x = upgradeBtnXpos
+	upgradeBtn.rect.y = upgradeBtnYpos
 	rect.blit(infoText,(5,5))
 	screen.blit(rect, (350,200))
+	screen.blit(upgradeBtn.image,(upgradeBtnXpos,upgradeBtnYpos))
+
 	
 	
 
@@ -54,6 +54,18 @@ def paintHUD():
 	screen.blit(cashText,[40,20])
 	screen.blit(energySign,(20,60))
 	screen.blit(energyBar.update(ENERGY),(40,60))
+
+def Refresh():
+	print("ENERGY")
+	global ENERGY
+	print(ENERGY)
+	ENERGY = 100;
+	print("Refreshing values")
+	for currentHouse in houseList:
+		ENERGY += currentHouse.energy
+	for currentTurbine in turbineList:
+		ENERGY += currentTurbine.energy
+	print(ENERGY)
 
 #Init pygame
 pygame.init()
@@ -70,6 +82,8 @@ groundXpos = 200
 groundYpos = 50
 turbineXpos = 40
 turbineYpos = 200
+upgradeBtnXpos = 400
+upgradeBtnYpos = 250
 levelMap = Map(10);
 
 # GAME VARIABLES
@@ -95,6 +109,9 @@ turbineBtn = ImageButton("gfx/placeholder.png")
 turbineBtn.rect.x = turbineXpos
 turbineBtn.rect.y = turbineYpos
 
+upgradeBtn = Button("Upgrade",100,100)
+
+
 
 
 #All sprites
@@ -111,9 +128,12 @@ mousePos = [0,0]
 movingHouse = False
 movingTurbine = False
 infoScreen = False
+SelectedID = 0
+houseInfo = False
+turbineInfo = False
 
 while 1:
-	clock.tick(60)
+	clock.tick(30)
 
 
 	#Eventhandling
@@ -127,6 +147,16 @@ while 1:
 			if startScreen:
 				startScreen = False
 			if infoScreen:
+				mouseX,mouseY = pygame.mouse.get_pos()
+				if upgradeBtn.rect.collidepoint(mouseX,mouseY):
+					if turbineInfo:
+						turbineList[SelectedID].upgrade()
+						Refresh()
+						turbineInfo = False
+					elif houseInfo:
+						houseList[SelectedID].upgrade()
+						Refresh()
+						houseInfo = False
 				infoScreen = False
 			else:	
 				mouseX,mouseY = pygame.mouse.get_pos()
@@ -138,12 +168,16 @@ while 1:
 					for currentTurbine in turbineList:
 						if currentTurbine.rect.collidepoint(mouseX,mouseY):
 							currentTurbine.setShowInfo(True)
+							SelectedID = turbineList.index(currentTurbine)
+							turbineInfo = True
 							infoScreen = True
 						else:
 							currentTurbine.setShowInfo(False)
 					for currentHouse in houseList:
 						if currentHouse.rect.collidepoint(mouseX,mouseY):
 							currentHouse.setShowInfo(True)
+							SelectedID = houseList.index(currentHouse)
+							houseInfo = True
 							infoScreen = True
 						else:
 							currentHouse.setShowInfo(False)
@@ -158,8 +192,8 @@ while 1:
 					if CASH >= houseNew.cost:
 						houseNew.setPos(mouseX-10,mouseY-10)
 						houseList.append(houseNew)
-						CASH= CASH - houseNew.cost
-						ENERGY = ENERGY + houseNew.energy
+						CASH -= houseNew.cost
+						ENERGY += houseNew.energy
 						house1.setPos(houseXpos,houseYpos)
 
 				movingHouse = False	
@@ -167,8 +201,8 @@ while 1:
 				if ground.rect.collidepoint(mouseX,mouseY):
 					turbineNew = Turbine()
 					if CASH >= turbineNew.cost:
-						CASH= CASH - turbineNew.cost
-						ENERGY = ENERGY + turbineNew.energy
+						CASH -= turbineNew.cost
+						ENERGY += turbineNew.energy
 						turbineNew.setPos(mouseX-10,mouseY-10)
 						turbineList.append(turbineNew)
 						turbineObj.setPos(turbineXpos,turbineYpos)
